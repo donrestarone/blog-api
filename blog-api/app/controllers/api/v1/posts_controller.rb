@@ -1,6 +1,7 @@
 class Api::V1::PostsController < ApplicationController
 	def index
-		render json: Post.api_all_posts(Post.all)
+		_limit = params[:limit]
+		render json: Post.api_all_posts((Post.order(created_at: :desc)).limit(_limit))
 	end
 
 	def show

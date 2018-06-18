@@ -35,8 +35,8 @@ class Post < ApplicationRecord
 			# deal with the meat of the post
 
 			post_data[:Author] = (User.find(post.user_id)).name.capitalize
-			post_data[:Title] = post.title
-			post_data[:Category] = (Tag.find(post.tag_id)).name
+			post_data[:Title] = post.title.capitalize
+			post_data[:Category] = (Tag.find(post.tag_id)).name.capitalize
 			post_data[:Published_on] = (post.created_at).strftime("%m/%d/%Y at %I:%M%p")
 			single_post[:data] = post_data
 
