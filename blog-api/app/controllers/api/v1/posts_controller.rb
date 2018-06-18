@@ -1,6 +1,6 @@
 class Api::V1::PostsController < ApplicationController
 	def index
-		render json: Post.all
+		render json: Post.api_all_posts(Post.all)
 	end
 
 	def show
