@@ -35,7 +35,36 @@ API endpoints:
 ```
   note; if a tag is unique a new tag instance will be created and stored in the database, otherwise the new post will be related to the existing tag instance
 
-  to comment on a post -> POST 
+  to comment on a post -> POST https://json-blog-api.herokuapp.com/api/v1/posts
+  specify under form-data under the body of the request, with the values for user_id: body: post_id:
+  ```json
+  {
+    "links": {
+        "self": "/blogs/2"
+    },
+    "data": {
+        "Type": "Blog Post",
+        "Id": 2,
+        "Title": "Hello world",
+        "Body": "First post",
+        "Category": "Ruby "
+    },
+    "Relationships": {
+        "author": {
+            "Author": "Sue",
+            "Posts_to_date": 1,
+            "Comments_to_date": 1
+        },
+        "Comments": [
+            {
+                "Author": "Sue",
+                "Body": " foo bar",
+                "created_at": "06/19/2018 at 10:21PM"
+            }
+        ]
+    }
+}
+  ```
 #READ
   read all stories arranged by newest first: GET -> https://json-blog-api.herokuapp.com/api/v1/posts/?limit=2
   limit specifies how many post objects are retrieved from the database
