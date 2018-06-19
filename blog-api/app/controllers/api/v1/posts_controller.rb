@@ -35,6 +35,7 @@ class Api::V1::PostsController < ApplicationController
 
 	def create
 		#http://localhost:3000/api/v1/posts && provide params title, body, user_id to create a post || provide name and email to create a user
+		# https://json-blog-api.herokuapp.com/api/v1/posts/
 		# specify params under form-data, headers -> Content-Type 'application/json'
 		if params[:title] && params[:body] && params[:user_id] && params[:tag]
 			# render json: {response: 'create post'}
@@ -71,7 +72,7 @@ class Api::V1::PostsController < ApplicationController
 			user = User.find(params[:user_id].to_i)
 			render json: User.modify_user(update_params, user)
 		else 
-			render json: {status: 'bad requset', code: 400}
+			render json: {status: 'bad request', code: 400}
 		end
 	end
 
