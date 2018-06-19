@@ -109,6 +109,31 @@ class Post < ApplicationRecord
 		return response
 	end
 
+	def self.create_post(params, tag_id)
+		root = '/blogs/'
+		post = Post.new(title: params[:title].capitalize, body: params[:body].capitalize, user_id: params[:user_id], tag_id: tag_id)
+		if post.save
+			response = Hash.new
+			response_data = Hash.new
+			attributes = Hash.new
+			relation_tree = Hash.new
+			# type/attributes
+			response_data[:type] = "Blog Post"
+			attributes[:title] = post.title
+			attributes[:src] = "#{root}#{post.id}"
+			response_data[:attributes] = attributes
+			relation_tree[:Author] = post.user.name
+			relation_tree[:Tag] = post.tag.name
+			response_data[:relationships] = relation_tree
+			# top level data
+
+			response[:data] = response_data
+			return response
+		else 
+			{response: 'Bad Request', code: 400, errors: post.errors.full_messages}
+		end
+	end
+
 	# used by api_all_posts/find_post for getting the next/prev post
 	def next
 		self.class.where("id > ?", id).first

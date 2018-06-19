@@ -34,7 +34,21 @@ class Api::V1::PostsController < ApplicationController
 	end
 
 	def create
-		render json: {response: 'create'}
+		#http://localhost:3000/api/v1/posts && provide params title, body, user_id to create a post
+		if params[:title] && params[:body] && params[:user_id] && params[:tag]
+			# render json: {response: 'create post'}
+			if Tag.find_by("name like ?", "%#{params[:tag]}%")
+				tag = Tag.find_by('name like ?', "#{params[:tag]}%")
+				render json: Post.create_post(create_params, tag.id)
+			else
+				tag = Tag.create(name: params[:tag])
+				render json: Post.create_post(create_params, tag.id)
+			end
+		elsif params[:name] && params[:email]
+			render json: {response: 'create user'}
+		else 
+			render json: {status: 'Bad Request', code: 400}
+		end
 	end
 
 	def destroy
@@ -44,4 +58,12 @@ class Api::V1::PostsController < ApplicationController
 	def update
 		render json: {response: 'update'}
 	end
+
+	private
+
+	def create_params
+		params.permit(:title, :body, :user_id, :tag, :name, :email)
+	end
+
+
 end
