@@ -64,7 +64,9 @@ class Post < ApplicationRecord
 		response = Hash.new
 		post_data = Array.new
 		comments = Array.new
+		
 		meta[:self] = "#{root}#{@post.id}"
+
 		# links
 		if @post.next	
 			meta[:next] = "#{root}#{@post.next.id}"

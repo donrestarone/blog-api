@@ -14,12 +14,23 @@ class Api::V1::PostsController < ApplicationController
 
 	def show
 		id_query = params[:id].to_i
-
-		render json: Post.api_find_post(Post.find(id_query))
+		if Post.find_by(id: id_query)
+			render json: Post.api_find_post(Post.find(id_query))
+		else
+			render json: {status: 'Not found', code: 404}
+		end
 	end
 
 	def search
-		render json: Post.first
+		# can search by author or title -> http://localhost:3000/api/v1/posts/search?author=cletus || http://localhost:3000/api/v1/posts/search?title=stuff
+		if params[:author] && User.find_by(name: params[:author].capitalize)
+			render json: Post.first
+		elsif params[:title] && Post.find_by("title like ?", "%#{params[:title]}%")
+			title = params[:title]
+			render json: Post.api_find_post(Post.find_by("title like ?", "%#{title}%"))
+		else 
+			render json: {status: 'Bad Request', code: 400}
+		end
 	end
 
 	def create
