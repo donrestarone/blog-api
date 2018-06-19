@@ -45,6 +45,7 @@ class Post < ApplicationRecord
 			relation = Hash.new
 			relation[:Author] = (User.find(post.user_id)).name.capitalize
 			relation[:Posts_to_date] = (User.find(post.user_id)).posts.count
+			relation[:Comments_to_date] = (User.find(post.user_id)).comments.count
 			single_post[:relationships] = relation
 
 			collection.push(single_post)
@@ -72,23 +73,41 @@ class Post < ApplicationRecord
 			meta[:previous] = "#{root}#{@post.previous.id}"
 		end
 		response[:links] = meta
-		# data
+		# data about post
 		boilerplate = Hash.new
 		boilerplate[:Type] = 'Blog Post'
 		boilerplate[:Id] = post.id
 
 		boilerplate[:Title] = post.title.capitalize
 		boilerplate[:Body] = post.body
-		boilerplate[:Author] = post.user.name.capitalize
 		boilerplate[:Category] = (Tag.find(post.tag_id)).name.capitalize
 		post_data.push(boilerplate)
 
 		response[:data] = post_data
-		response[:Relationships] = 'hi'
+		# data for relationships
+		author = Hash.new
+		relationship_tree = Hash.new
+		author[:Author] = post.user.name.capitalize
+		author[:Posts_to_date] = User.find(post.user_id).posts.count
+		author[:Comments_to_date] = User.find(post.user_id).comments.count
+		relationship_tree[:author] = author 
+		response[:Relationships] = relationship_tree
+		# comments
+		comments = Array.new
+		if post.comments
+			post.comments.map do |comment|
+				comments.push({
+					Author: User.find(comment.user_id).name,
+					Body: comment.body,
+					created_at: comment.created_at.strftime("%m/%d/%Y at %I:%M%p")
+				})
+			end
+		end
+		relationship_tree[:Comments] = comments
 		return response
 	end
 
-	# used by api_all_posts for getting the next/prev post
+	# used by api_all_posts/find_post for getting the next/prev post
 	def next
 		self.class.where("id > ?", id).first
 	end
