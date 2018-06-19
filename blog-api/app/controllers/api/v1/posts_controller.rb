@@ -34,7 +34,8 @@ class Api::V1::PostsController < ApplicationController
 	end
 
 	def create
-		#http://localhost:3000/api/v1/posts && provide params title, body, user_id to create a post
+		#http://localhost:3000/api/v1/posts && provide params title, body, user_id to create a post || provide name and email to create a user
+		# specify params under form-data, headers -> Content-Type 'application/json'
 		if params[:title] && params[:body] && params[:user_id] && params[:tag]
 			# render json: {response: 'create post'}
 			if Tag.find_by("name like ?", "%#{params[:tag]}%")
@@ -45,9 +46,9 @@ class Api::V1::PostsController < ApplicationController
 				render json: Post.create_post(create_params, tag.id)
 			end
 		elsif params[:name] && params[:email]
-			render json: {response: 'create user'}
+			render json: User.create_user(create_params)
 		else 
-			render json: {status: 'Bad Request', code: 400}
+			render json: {status: 'Bad Request', code: 400, to_create_post: 'under form-data specify post title, body, tag and user id to create a post', to_create_user: 'under form-data specify the name and email'}
 		end
 	end
 

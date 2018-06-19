@@ -6,7 +6,7 @@ Tag.delete_all
 usr_names = ['Bob', 'Grant', 'Cletus', 'Raj', 'Tabitha', 'Rose', 'Eunice']
 
 usr_names.each do |name|
-	email = "#{name}@example.com"
+	email = "#{name.downcase}@example.com"
 	User.create(name: name, email: email)
 end
 

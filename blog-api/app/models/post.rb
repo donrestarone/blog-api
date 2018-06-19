@@ -121,16 +121,17 @@ class Post < ApplicationRecord
 			response_data[:type] = "Blog Post"
 			attributes[:title] = post.title
 			attributes[:src] = "#{root}#{post.id}"
+			attributes[:created_at] = post.created_at.strftime("%m/%d/%Y at %I:%M%p")
 			response_data[:attributes] = attributes
 			relation_tree[:Author] = post.user.name
 			relation_tree[:Tag] = post.tag.name
 			response_data[:relationships] = relation_tree
+			
 			# top level data
-
 			response[:data] = response_data
 			return response
 		else 
-			{response: 'Bad Request', code: 400, errors: post.errors.full_messages}
+			{response: 'Bad Request', code: 400, errors: post.errors.full_messages, messages: ['please provide title, body, user_id and a tag to create a post', 'to create a user, please specify email, and name']}
 		end
 	end
 
