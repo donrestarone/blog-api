@@ -36,7 +36,7 @@ API endpoints:
   note; if a tag is unique a new tag instance will be created and stored in the database, otherwise the new post will be related to the existing tag instance
 
   to comment on a post -> POST https://json-blog-api.herokuapp.com/api/v1/posts
-  specify under form-data under the body of the request, with the values for user_id: body: post_id:
+  specify under form-data under the body of the request, with the values for user_id:, body: and post_id:
   ```json
   {
     "links": {

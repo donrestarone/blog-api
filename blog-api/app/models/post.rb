@@ -6,7 +6,7 @@ class Post < ApplicationRecord
 	validates :body, presence: true
 	def self.api_all_posts(posts)
 		#define root to use in the meta
-		root = '/blogs/'
+		root = 'https://json-blog-api.herokuapp.com/blogs/'
 		# parent hash
 		response = Hash.new
 		# collection of posts
@@ -32,17 +32,17 @@ class Post < ApplicationRecord
 			single_post[:links] = post_meta
 
 			# deal with the meat of the post
-			post_data[:Title] = post.title.capitalize
-			post_data[:Category] = (Tag.find(post.tag_id)).name.capitalize
-			post_data[:Body] = post.body
-			post_data[:Published_on] = (post.created_at).strftime("%m/%d/%Y at %I:%M%p")
-			post_data[:Last_edited] = (post.updated_at).strftime("%m/%d/%Y at %I:%M%p")
+			post_data[:title] = post.title.capitalize
+			post_data[:category] = (Tag.find(post.tag_id)).name.capitalize
+			post_data[:body] = post.body
+			post_data[:published_on] = (post.created_at).strftime("%m/%d/%Y at %I:%M%p")
+			post_data[:last_edited] = (post.updated_at).strftime("%m/%d/%Y at %I:%M%p")
 			single_post[:meta] = post_data
 			# deal with relationships
 			relation = Hash.new
-			relation[:Author] = (User.find(post.user_id)).name.capitalize
-			relation[:Posts_to_date] = (User.find(post.user_id)).posts.count
-			relation[:Comments_to_date] = (User.find(post.user_id)).comments.count
+			relation[:author] = (User.find(post.user_id)).name.capitalize
+			relation[:posts_to_date] = (User.find(post.user_id)).posts.count
+			relation[:comments_to_date] = (User.find(post.user_id)).comments.count
 			single_post[:relationships] = relation
 
 			collection.push(single_post)
@@ -52,7 +52,7 @@ class Post < ApplicationRecord
 	end
 
 	def self.api_find_post(post)
-		root = '/blogs/'
+		root = 'https://json-blog-api.herokuapp.com/blogs/'
 		@post = post
 		meta = Hash.new
 		response = Hash.new
@@ -70,22 +70,22 @@ class Post < ApplicationRecord
 		response[:links] = meta
 
 		boilerplate = Hash.new
-		boilerplate[:Type] = 'Blog Post'
-		boilerplate[:Id] = post.id
+		boilerplate[:type] = 'Blog Post'
+		boilerplate[:id] = post.id
 
-		boilerplate[:Title] = post.title.capitalize
-		boilerplate[:Body] = post.body
+		boilerplate[:title] = post.title.capitalize
+		boilerplate[:body] = post.body
 		boilerplate[:Category] = (Tag.find(post.tag_id)).name.capitalize
 
 		response[:data] = boilerplate
 		# data for relationships
 		author = Hash.new
 		relationship_tree = Hash.new
-		author[:Author] = post.user.name.capitalize
-		author[:Posts_to_date] = User.find(post.user_id).posts.count
-		author[:Comments_to_date] = User.find(post.user_id).comments.count
+		author[:author] = post.user.name.capitalize
+		author[:posts_to_date] = User.find(post.user_id).posts.count
+		author[:comments_to_date] = User.find(post.user_id).comments.count
 		relationship_tree[:author] = author 
-		response[:Relationships] = relationship_tree
+		response[:relationships] = relationship_tree
 		# comments
 		comments = Array.new
 		if post.comments
@@ -187,7 +187,7 @@ class Post < ApplicationRecord
 	end
 
 	def self.create_data_structure_for_create_post(post)
-		root = '/blogs/'
+		root = 'https://json-blog-api.herokuapp.com/blogs/'
 		response = Hash.new
 		response_data = Hash.new
 		attributes = Hash.new
@@ -198,8 +198,8 @@ class Post < ApplicationRecord
 		attributes[:src] = "#{root}#{post.id}"
 		attributes[:created_at] = post.created_at.strftime("%m/%d/%Y at %I:%M%p")
 		response_data[:attributes] = attributes
-		relation_tree[:Author] = post.user.name
-		relation_tree[:Tag] = post.tag.name
+		relation_tree[:author] = post.user.name
+		relation_tree[:tag] = post.tag.name
 		response_data[:relationships] = relation_tree
 		
 		# top level data
