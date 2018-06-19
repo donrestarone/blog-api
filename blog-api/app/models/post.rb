@@ -10,8 +10,6 @@ class Post < ApplicationRecord
 		response = Hash.new
 		# collection of posts
 		collection = Array.new
-
-
 		posts.each do |post|
 			@post = post
 			
@@ -33,8 +31,6 @@ class Post < ApplicationRecord
 			single_post[:links] = post_meta
 
 			# deal with the meat of the post
-
-
 			post_data[:Title] = post.title.capitalize
 			post_data[:Category] = (Tag.find(post.tag_id)).name.capitalize
 			post_data[:Body] = post.body
@@ -49,9 +45,6 @@ class Post < ApplicationRecord
 			single_post[:relationships] = relation
 
 			collection.push(single_post)
-
-			
-			
 		end
 		response[:data] = collection
 		return response
@@ -62,7 +55,6 @@ class Post < ApplicationRecord
 		@post = post
 		meta = Hash.new
 		response = Hash.new
-		post_data = Array.new
 		comments = Array.new
 		
 		meta[:self] = "#{root}#{@post.id}"
@@ -75,7 +67,7 @@ class Post < ApplicationRecord
 			meta[:previous] = "#{root}#{@post.previous.id}"
 		end
 		response[:links] = meta
-		# data about post
+
 		boilerplate = Hash.new
 		boilerplate[:Type] = 'Blog Post'
 		boilerplate[:Id] = post.id
@@ -83,9 +75,8 @@ class Post < ApplicationRecord
 		boilerplate[:Title] = post.title.capitalize
 		boilerplate[:Body] = post.body
 		boilerplate[:Category] = (Tag.find(post.tag_id)).name.capitalize
-		post_data.push(boilerplate)
 
-		response[:data] = post_data
+		response[:data] = boilerplate
 		# data for relationships
 		author = Hash.new
 		relationship_tree = Hash.new
@@ -110,28 +101,49 @@ class Post < ApplicationRecord
 	end
 
 	def self.create_post(params, tag_id)
-		root = '/blogs/'
+		
 		post = Post.new(title: params[:title].capitalize, body: params[:body].capitalize, user_id: params[:user_id], tag_id: tag_id)
 		if post.save
-			response = Hash.new
-			response_data = Hash.new
-			attributes = Hash.new
-			relation_tree = Hash.new
-			# type/attributes
-			response_data[:type] = "Blog Post"
-			attributes[:title] = post.title
-			attributes[:src] = "#{root}#{post.id}"
-			attributes[:created_at] = post.created_at.strftime("%m/%d/%Y at %I:%M%p")
-			response_data[:attributes] = attributes
-			relation_tree[:Author] = post.user.name
-			relation_tree[:Tag] = post.tag.name
-			response_data[:relationships] = relation_tree
-			
-			# top level data
-			response[:data] = response_data
-			return response
+			return Post.create_data_structure_for_create_post(post)
 		else 
 			{response: 'Bad Request', code: 400, errors: post.errors.full_messages, messages: ['please provide title, body, user_id and a tag to create a post', 'to create a user, please specify email, and name']}
+		end
+	end
+
+	def self.destroy_post(post_obj)
+		@deleted_post = post_obj
+		if post_obj.destroy
+			Post.create_data_structure_for_delete_post(@deleted_post)
+		else
+			return {response: 'server error', code: 500, errors: post_obj.errors.full_messages}
+		end
+	end
+
+	def self.modify_post(params, post_obj)
+		if params[:title] && params[:body]
+			post_obj.title = params[:title]
+			post_obj.body = params[:body]
+			if post_obj.save
+				return Post.create_data_structure_for_modify_post(post_obj)
+			else 
+				return {response: 'server error', code: 500}
+			end
+		elsif params[:title]
+			post_obj.title = params[:title]
+			if post_obj.save
+				return Post.create_data_structure_for_modify_post(post_obj)
+			else
+				return {response: 'server error', code: 500}
+			end
+		elsif params[:body]
+			post_obj.body = params[:body] 
+			if post_obj.save
+				return Post.create_data_structure_for_modify_post(post_obj)
+			else
+				return {response: 'server error', code: 500}
+			end
+		else
+			return {response: 'bad request', code: 400}
 		end
 	end
 
@@ -142,5 +154,55 @@ class Post < ApplicationRecord
 
 	def previous
 		self.class.where("id < ?", id).last
+	end
+
+	private
+	def self.create_data_structure_for_modify_post(post_obj)
+		response = Hash.new
+		data = Hash.new
+		relationships = Hash.new
+		data[:type] = 'Blog Post'
+		data[:id] = post_obj.id
+		data[:title] = post_obj.title
+		data[:body] = post_obj.body
+		data[:updated_at] = post_obj.updated_at.strftime("%m/%d/%Y at %I:%M%p")
+		relationships[:author] = post_obj.user.name
+		data[:relationships] = relationships
+		response[:data] = data
+		return response
+	end	
+
+	def self.create_data_structure_for_delete_post(deleted_post)
+		response = Hash.new
+		meta = Hash.new
+		response[:code] = 200
+		response[:status] = 'OK'
+		meta[:title] = @deleted_post.title
+		meta[:author] = @deleted_post.user.name
+		meta[:tag] = @deleted_post.tag.name
+		meta[:deleted_at] = Time.now.strftime("%m/%d/%Y at %I:%M%p")
+		response[:attributes] = meta
+		return response
+	end
+
+	def self.create_data_structure_for_create_post(post)
+		root = '/blogs/'
+		response = Hash.new
+		response_data = Hash.new
+		attributes = Hash.new
+		relation_tree = Hash.new
+		# type/attributes
+		response_data[:type] = "Blog Post"
+		attributes[:title] = post.title
+		attributes[:src] = "#{root}#{post.id}"
+		attributes[:created_at] = post.created_at.strftime("%m/%d/%Y at %I:%M%p")
+		response_data[:attributes] = attributes
+		relation_tree[:Author] = post.user.name
+		relation_tree[:Tag] = post.tag.name
+		response_data[:relationships] = relation_tree
+		
+		# top level data
+		response[:data] = response_data
+		return response
 	end
 end

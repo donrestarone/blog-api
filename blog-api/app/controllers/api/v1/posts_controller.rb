@@ -53,15 +53,32 @@ class Api::V1::PostsController < ApplicationController
 	end
 
 	def destroy
-		render json: {response: 'destroy'}
+		
+		if Post.find_by(id: params[:id])
+			post = Post.find(params[:id])
+			render json: Post.destroy_post(post)
+		else 
+			render json: {status: 'not found', code: 404}
+		end
 	end
 
 	def update
-		render json: {response: 'update'}
+		# to update a user -> http://localhost:3000/api/v1/posts/changeuser && specify user_id and name in form data || http://localhost:3000/api/v1/posts/changepost && specify title or body to change it
+		if params[:id] == 'changepost' && Post.find_by(id: params[:post_id].to_i) && update_params
+			post = Post.find(params[:post_id].to_i)
+			render json: Post.modify_post(update_params, post)
+		elsif params[:id] == 'changeuser' && User.find_by(id: params[:user_id].to_i) && update_params
+			user = User.find(params[:user_id].to_i)
+			render json: User.modify_user(update_params, user)
+		else 
+			render json: {status: 'bad requset', code: 400}
+		end
 	end
 
 	private
-
+	def update_params
+		params.permit(:id, :post_id, :user_id, :title, :body, :name)
+	end
 	def create_params
 		params.permit(:title, :body, :user_id, :tag, :name, :email)
 	end
