@@ -24,7 +24,7 @@ class Api::V1::PostsController < ApplicationController
 	def search
 		# can search by author or title -> http://localhost:3000/api/v1/posts/search?author=cletus || http://localhost:3000/api/v1/posts/search?title=stuff
 		if params[:author] && User.find_by(name: params[:author].capitalize)
-			render json: Post.first
+			render json: Post.api_all_posts((User.find_by(name: params[:author].capitalize)).posts)
 		elsif params[:title] && Post.find_by("title like ?", "%#{params[:title]}%")
 			title = params[:title]
 			render json: Post.api_find_post(Post.find_by("title like ?", "%#{title}%"))
