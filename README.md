@@ -1,8 +1,9 @@
 API endpoints:
 
-CREATE
+#CREATE
   to create new users: POST https://json-blog-api.herokuapp.com/api/v1/posts
     provide form-data in the body -> email: foo@baz.com, name: bar
+```json
     sample response: {
     "data": {
         "type": "User",
@@ -13,9 +14,10 @@ CREATE
         }
     }
 }
-
+```
   to create new posts: https://json-blog-api.herokuapp.com/api/v1/posts
     provide form data in the body -> user_id: int, title: foo, body: bar, tag: baz
+```json    
     sample response: {
     "data": {
         "type": "Blog Post",
@@ -30,11 +32,12 @@ CREATE
         }
     }
 }
-
+```
   note; if a tag is unique a new tag instance will be created and stored in the database, otherwise the new post will be related to the existing tag instance
-READ
+#READ
   read all stories arranged by newest first: https://json-blog-api.herokuapp.com/api/v1/posts/?limit=2
   limit specifies how many post objects are retrieved from the database
+```json  
   sample response: {
     "data": [
         {
@@ -75,9 +78,11 @@ READ
         }
     ]
 }
+```
   note: if limit is higher than the post count in the database, a bad request response is returned
   read a single story: https://json-blog-api.herokuapp.com/api/v1/posts/2
   when id is specified the api returns a single story and all its relationships
+```json  
   sample response: {
     "links": {
         "self": "/blogs/2",
@@ -99,8 +104,9 @@ READ
         "Comments": []
     }
 }
-
+```
   to search by author and get all their articles -> GET https://json-blog-api.herokuapp.com/api/v1/posts/search?author=authorname
+```json  
   sample response: {
     "data": [
         {
@@ -141,8 +147,9 @@ READ
         }
     ]
 }
-
+```
   to search by article title -> GET https://json-blog-api.herokuapp.com/api/v1/posts/search?title=Hello world
+```json  
   sample response: {
     "links": {
         "self": "/blogs/1",
@@ -164,9 +171,11 @@ READ
         "Comments": []
     }
 }
-UPDATE
+```
+#UPDATE
   to change user name -> PUT https://json-blog-api.herokuapp.com/api/v1/posts/changeuser
   specify user_id: and name: in the form-data body and Content-Type: 'application/json' in the headers
+```json  
   sample response: {
     "data": {
         "type": "User",
@@ -177,8 +186,10 @@ UPDATE
         }
     }
 }
+```
   to change a post -> PUT https://json-blog-api.herokuapp.com/api/v1/posts/changepost
   append the same headers as before, but instead specify title:, body: and the post_id: in the form-data body
+```json  
   sample response: {
     "data": {
         "type": "Blog Post",
@@ -191,9 +202,11 @@ UPDATE
         }
     }
 }
-DELETE 
+```
+#DELETE 
   to delete a post -> DELETE https://json-blog-api.herokuapp.com/api/v1/posts/1
   specify post id in the query string, if delete is successful 
+```json  
   this response is returned: {
     "code": 200,
     "status": "OK",
@@ -204,3 +217,4 @@ DELETE
         "deleted_at": "06/19/2018 at 09:34PM"
     }
 }
+```
