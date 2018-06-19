@@ -48,8 +48,17 @@ class Api::V1::PostsController < ApplicationController
 			end
 		elsif params[:name] && params[:email]
 			render json: User.create_user(create_params)
+
+		elsif params[:post_id] && params[:user_id] && params[:body]
+			if Post.find_by(id: params[:post_id].to_i) && User.find_by(id: params[:user_id].to_i)
+				post = Post.find_by(id: params[:post_id].to_i)
+				user = User.find_by(id: params[:user_id].to_i)
+				render json: Comment.create_comment(params[:body], user, post)
+			else
+				render json: {status: 'not found', code: 404}
+			end
 		else 
-			render json: {status: 'Bad Request', code: 400, to_create_post: 'under form-data specify post title, body, tag and user id to create a post', to_create_user: 'under form-data specify the name and email'}
+			render json: {status: 'Bad Request', code: 400, to_create_post: 'under form-data specify post title, body, tag and user id to create a post', to_create_a_comment: 'under form-data specify post_id user_id and body', to_create_user: 'under form-data specify the name and email'}
 		end
 	end
 
@@ -81,7 +90,7 @@ class Api::V1::PostsController < ApplicationController
 		params.permit(:id, :post_id, :user_id, :title, :body, :name)
 	end
 	def create_params
-		params.permit(:title, :body, :user_id, :tag, :name, :email)
+		params.permit(:title, :body, :user_id, :tag, :name, :email, :post_id, :comment)
 	end
 
 
