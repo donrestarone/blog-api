@@ -1,7 +1,7 @@
 API endpoints:
 
 #CREATE
-  to create new users: POST https://json-blog-api.herokuapp.com/api/v1/posts
+  to create new users: POST -> https://json-blog-api.herokuapp.com/api/v1/posts
     provide form-data in the body -> email: foo@baz.com, name: bar
 ```json
     sample response: {
@@ -15,7 +15,7 @@ API endpoints:
     }
 }
 ```
-  to create new posts: https://json-blog-api.herokuapp.com/api/v1/posts
+  to create new posts: POST -> https://json-blog-api.herokuapp.com/api/v1/posts
     provide form data in the body -> user_id: int, title: foo, body: bar, tag: baz
 ```json    
     sample response: {
@@ -34,8 +34,10 @@ API endpoints:
 }
 ```
   note; if a tag is unique a new tag instance will be created and stored in the database, otherwise the new post will be related to the existing tag instance
+
+  to comment on a post -> POST 
 #READ
-  read all stories arranged by newest first: https://json-blog-api.herokuapp.com/api/v1/posts/?limit=2
+  read all stories arranged by newest first: GET -> https://json-blog-api.herokuapp.com/api/v1/posts/?limit=2
   limit specifies how many post objects are retrieved from the database
 ```json  
   sample response: {
@@ -80,7 +82,7 @@ API endpoints:
 }
 ```
   note: if limit is higher than the post count in the database, a bad request response is returned
-  read a single story: https://json-blog-api.herokuapp.com/api/v1/posts/2
+  read a single story: GET -> https://json-blog-api.herokuapp.com/api/v1/posts/2
   when id is specified the api returns a single story and all its relationships
 ```json  
   sample response: {
