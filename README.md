@@ -249,3 +249,10 @@ API endpoints:
     }
 }
 ```
+
+
+**EXAMPLE REQUESTS**
+
+**GET**  https://json-blog-api.herokuapp.com/api/v1/posts/search?title=Letter
+**GET**  https://json-blog-api.herokuapp.com/api/v1/posts/?limit=7
+**GET**  https://json-blog-api.herokuapp.com/api/v1/posts/11
