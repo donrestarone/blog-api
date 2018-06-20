@@ -1,7 +1,7 @@
 class Post < ApplicationRecord
 	belongs_to :user
 	belongs_to :tag
-	has_many :comments
+	has_many :comments, :dependent => :delete_all
 	validates :title, presence: true
 	validates :body, presence: true
 	def self.api_all_posts(posts)
